@@ -22,7 +22,6 @@ case object PeripheryBeagleKey extends Field[BeagleParams]
 case object BeaglePipelineResetDepth extends Field[Int]
 case object CacheBlockStriping extends Field[Int]
 case object LbwifBitWidth extends Field[Int]
-case object ScratchPadAddressSet extends Field[AddressSet]
 
 case class BeagleParams(
   scrAddress: Int,
@@ -31,13 +30,13 @@ case class BeagleParams(
   rsClkDivBits: Int = 8,
   lbwifClkDivBits: Int = 8,
   uncoreClkDivInit: Int = 4,
-  bhClkDivInit: Int = 2,
-  rsClkDivInit: Int = 2,
-  lbwifClkDivInit: Int = 4,
+  bhClkDivInit: Int = 1,
+  rsClkDivInit: Int = 1,
+  lbwifClkDivInit: Int = 1,
   uncoreClkPassSelInit: Int = 1, // default div
-  bhClkPassSelInit: Int = 0, // default undiv
-  rsClkPassSelInit: Int = 0, // default undiv
-  lbwifClkPassSelInit: Int = 1 // default div
+  bhClkPassSelInit: Int = 1, // default div
+  rsClkPassSelInit: Int = 1, // default div
+  lbwifClkPassSelInit: Int = 0 // default undiv
 )
 
 /**
@@ -215,15 +214,6 @@ trait HasPeripheryBeagle
   val scrName = Some("beagle_scr")
   val scr = LazyModule(new TLBeagle(pbus.beatBytes, scrParams)).suggestName(scrName)
   pbus.toVariableWidthSlave(scrName) { scr.node := TLBuffer() }
-
-  // setup boot scratch pad
-  val boot_scratchpad = LazyModule(new TLRAM(
-    address = p(ScratchPadAddressSet),
-    cacheable = false,
-    executable = true,
-    beatBytes = 8))
-  val boot_scratchpad_buffer = LazyModule(new TLBuffer())
-  pbus.toVariableWidthSlave(Some("boot_scratchpad")) { boot_scratchpad.node := boot_scratchpad_buffer.node := TLBuffer() }
 
   val extMem = p(ExtMem).get
   val extParams = extMem.master

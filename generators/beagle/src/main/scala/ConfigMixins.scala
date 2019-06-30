@@ -3,7 +3,7 @@ package beagle
 import chisel3._
 
 import freechips.rocketchip.config.{Field, Parameters, Config}
-import freechips.rocketchip.subsystem.{ExtMem, RocketTilesKey, BankedL2Key, WithJtagDTM, WithRationalRocketTiles, WithNMemoryChannels, WithNBanks, SystemBusKey, MemoryBusKey, ControlBusKey, CacheBlockBytes}
+import freechips.rocketchip.subsystem.{WithInclusiveCache, ExtMem, RocketTilesKey, BankedL2Key, WithJtagDTM, WithRationalRocketTiles, WithNMemoryChannels, WithNBanks, SystemBusKey, MemoryBusKey, ControlBusKey, CacheBlockBytes}
 import freechips.rocketchip.diplomacy.{LazyModule, ValName, AddressSet}
 import freechips.rocketchip.tile.{LazyRoCC, BuildRoCC, OpcodeSet, TileKey, RocketTileParams}
 import freechips.rocketchip.rocket.{RocketCoreParams, BTBParams, DCacheParams, ICacheParams, MulDivParams}
@@ -34,6 +34,15 @@ import example.{MultiRoCCKey}
 // --------------
 
 /**
+ * Add a inclusive L2
+ */
+class WithBeagleL2 extends Config(
+  new WithInclusiveCache(
+    nBanks = 4,
+    capacityKB = 1024)
+)
+
+/**
  * Setup general BEAGLE parameters
  */
 class WithBeagleChanges extends Config((site, here, up) => {
@@ -45,17 +54,9 @@ class WithBeagleChanges extends Config((site, here, up) => {
   }
   case BeaglePipelineResetDepth => 5
   case HbwifPipelineResetDepth => 5
-  case CacheBlockStriping => 2
+  case CacheBlockStriping => 4
   case LbwifBitWidth => 4
   case PeripheryBeagleKey => BeagleParams(scrAddress = 0x110000)
-  case ScratchPadAddressSet => AddressSet(0x50000000, 0xffff)
-})
-
-/**
- * Large scratchpad size
- */
-class WithLargerScratchpad extends Config((site, here, up) => {
-  case ScratchPadAddressSet => AddressSet(0x50000000, 0xfffff)
 })
 
 /**

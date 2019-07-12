@@ -63,6 +63,7 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     case HbwifTLKey => {
       //println(s"${p(HbwifTLKey)}")
       p(HbwifTLKey).copy(
+        numXact = (1 << (5 + log2Ceil(p(HbwifNumLanes)))),
         clientPort = true,
         clientTLUH = false,
         clientTLC = false,

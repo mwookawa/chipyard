@@ -47,7 +47,7 @@ VCS_CC_OPTS = \
 	-CC "-I$(RISCV)/include" \
 	-CC "-std=c++11" \
 	-CC "-Wl,-rpath,$(RISCV)/lib" \
-	/scratch/abejgonza/beagle/beagle-fesvr/build/libfesvr.so
+	/scratch/abejgonza/beagle/beagle-temp-work/beagle-fesvr/build/libfesvr.so
 
 VCS_NONCC_OPTS = \
 	+lint=all,noVCDE,noONGS,noUI \
@@ -80,7 +80,7 @@ VCS_OPTS = -notice -line $(VCS_CC_OPTS) $(VCS_NONCC_OPTS)
 sim_vcs_blackboxes ?= $(build_dir)/firrtl_black_box_resource_files.vcs.f
 
 $(sim_vcs_blackboxes): $(sim_top_blackboxes) $(sim_harness_blackboxes)
-	join -a 1 -a 2 <(sort $(sim_top_blackboxes)) <(sort $(sim_harness_blackboxes)) > $@
+	awk '{print $1;}' $^ | sort -u > $@
 
 #########################################################################################
 # vcs simulator rules
@@ -97,7 +97,7 @@ $(sim_debug) : $(sim_vsrcs) $(sim_dotf) $(sim_vcs_blackboxes)
 # helper rules to run simulator with debug
 #########################################################################################
 run-binary-debug: $(sim_debug)
-	$(sim_debug) $(PERMISSIVE_ON) $(SIM_FLAGS) +vcdplusfile=$(sim_out_name).vpd $(PERMISSIVE_OFF) $(BINARY) 3>&1 1>&2 2>&3 | spike-dasm > $(sim_out_name).out
+	(set -o pipefail && $(sim_debug) $(PERMISSIVE_ON) $(SIM_FLAGS) +vcdplusfile=$(sim_out_name).vpd $(PERMISSIVE_OFF) $(BINARY) 3>&1 1>&2 2>&3 | spike-dasm > $(sim_out_name).out)
 
 #########################################################################################
 # create a vcs vpd rule

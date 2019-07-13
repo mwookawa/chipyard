@@ -42,6 +42,7 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
       beatBytes = p(ExtMem).get.master.beatBytes,
       trackCorruption = false)))
 
+  println("Harnessside")
   val lbwif = LazyModule(new TLSerdesser(
     w = p(LbwifBitWidth),
     clientParams = TLClientParameters(
@@ -55,13 +56,15 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
       fifoId = Some(0),
       supportsGet        = TransferSizes(1, p(CacheBlockBytes)),
       supportsPutFull    = TransferSizes(1, p(CacheBlockBytes)),
-      supportsPutPartial = TransferSizes(1, p(CacheBlockBytes))),
+      supportsPutPartial = TransferSizes(1, p(CacheBlockBytes)),
+      supportsAcquireT   = TransferSizes(1, p(CacheBlockBytes)),
+      supportsAcquireB   = TransferSizes(1, p(CacheBlockBytes)),
+      supportsArithmetic = TransferSizes(1, p(CacheBlockBytes))),
      beatBytes = p(ExtMem).get.master.beatBytes,
-     endSinkId = 0))
+     endSinkId = 1<<6))
 
   val hbwif = LazyModule(new GenericHbwifModule()(p.alterPartial({
     case HbwifTLKey => {
-      //println(s"${p(HbwifTLKey)}")
       p(HbwifTLKey).copy(
         numXact = (1 << (5 + log2Ceil(p(HbwifNumLanes)))),
         clientPort = true,
@@ -87,6 +90,7 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     ram.node := TLFragmenter(p(ExtMem).get.master.beatBytes, p(CacheBlockBytes)) := mem_xbar.node
   }
 
+  //lbwif.managerNode := TLBuffer() := TLSinkSetter(6) := adapter.node
   lbwif.managerNode := TLBuffer() := adapter.node
 
   // connect the hbwif/lbwif to the ram
@@ -201,5 +205,41 @@ object Timer {
       count := count - 1.U
     }
     done
+  }
+}
+
+class TLSinkSetter(endSinkId: Int)(implicit p: Parameters) extends LazyModule {
+  val node = TLAdapterNode(managerFn = { m => m.copy(endSinkId = endSinkId) })
+  lazy val module = new LazyModuleImp(this) {
+    // FIXME: bulk connect
+    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
+      out.valid := in.valid
+      out.bits := in.bits
+      in.ready := out.ready
+    }
+
+    (node.in zip node.out) foreach { case ((in, edgeIn), (out, edgeOut)) =>
+      connect(out.a, in.a) // out.a <> in .a
+      connect(in.d, out.d) // in .d <> out.d
+      if (edgeOut.manager.anySupportAcquireB && edgeOut.client.anySupportProbe) {
+        connect(in.b, out.b) // in .b <> out.b
+        connect(out.c, in.c) // out.c <> in .c
+        connect(out.e, in.e) // out.e <> in .e
+      } else {
+        in.b.valid := false.B
+        in.c.ready := true.B
+        in.e.ready := true.B
+        out.b.ready := true.B
+        out.c.valid := false.B
+        out.e.valid := false.B
+      }
+    }
+  }
+}
+
+object TLSinkSetter {
+  def apply(endSinkId: Int)(implicit p: Parameters): TLNode = {
+    val widener = LazyModule(new TLSinkSetter(endSinkId))
+    widener.node
   }
 }

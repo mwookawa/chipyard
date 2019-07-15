@@ -90,7 +90,6 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     ram.node := TLFragmenter(p(ExtMem).get.master.beatBytes, p(CacheBlockBytes)) := mem_xbar.node
   }
 
-  //lbwif.managerNode := TLBuffer() := TLSinkSetter(6) := adapter.node
   lbwif.managerNode := TLBuffer() := adapter.node
 
   // connect the hbwif/lbwif to the ram
@@ -149,8 +148,8 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     dut.spi  := DontCare
     dut.uart := DontCare
     dut.jtag := DontCare
-    dut.hbwif.tx <> hbwif.module.tx
-    dut.hbwif.rx <> hbwif.module.rx
+    dut.hbwif.tx <> hbwif.module.rx
+    dut.hbwif.rx <> hbwif.module.tx
     dut.hbwif_diff_clks.foreach { _ := DontCare }
     dut.hbwif_diff_clks.foreach { diff_clk =>
       attach(diff_clk.p, harness_fast_clk.p)

@@ -236,23 +236,13 @@ trait HasPeripheryBeagle
     beatBytes = extParams.beatBytes,
     lineBytes = p(CacheBlockBytes),
     idBits = 13))
-  switcher.innode :*= mbus.coupleTo("switcherPort") { TLBuffer() :*= _ }
 
   val hbwif = LazyModule(p(BuildHbwif)(p))
 
-  val memSplitXbar = (0 until extMem.nMemoryChannels).map{_ => LazyModule(new TLXbar)}
   for (i <- 0 until p(HbwifNumLanes)) {
-    pbus.toVariableWidthSlave(Some(s"hbwif_config$i")) { hbwif.configNodes(i) := TLBuffer() := TLBuffer() := TLWidthWidget(pbus.beatBytes) }
-    /* Add filters dividing numMemChannels into numHbiwfLanes */
-    val lane = i
-    val mbusIndex = i/lanesPerMemoryChannel
-    val smallerMask = ~BigInt((p(HbwifNumLanes)-1) * p(CacheBlockBytes))
-    val smallerOffset = i
-    hbwif.managerNode := memSplitXbar(mbusIndex).node
-    // Every lanesPerMemoryChannel hbwif lane we also connect the new xbar to the switcher
-    if ((i % lanesPerMemoryChannel) == 0) {
-      memSplitXbar(mbusIndex).node := TLBuffer() := switcher.outnodes(0)
-    }
+    pbus.toVariableWidthSlave(Some(s"hbwif_config$i")) { hbwif.configNodes(i) := TLBuffer.chainNode(5) := TLWidthWidget(pbus.beatBytes) }
+    hbwif.managerNode := TLBuffer.chainNode(3) := switcher.outnodes(0)
+    switcher.innode := mbus.coupleTo(s"switcherPort_$i") { TLBuffer() := _}
   }
 
   // setup the backup serdes (otherwise known as the lbwif)

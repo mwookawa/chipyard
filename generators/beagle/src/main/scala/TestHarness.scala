@@ -66,7 +66,7 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
   val hbwif = LazyModule(new GenericHbwifModule()(p.alterPartial({
     case HbwifTLKey => {
       p(HbwifTLKey).copy(
-        numXact = (1 << (5 + log2Ceil(p(HbwifNumLanes)))),
+        numXact = (1 << 13),
         clientPort = true,
         clientTLUH = false,
         clientTLC = false,

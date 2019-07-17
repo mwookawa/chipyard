@@ -69,7 +69,7 @@ $(HARNESS_SMEMS_FILE) $(HARNESS_SMEMS_FIR): $(HARNESS_SMEMS_CONF)
 #########################################################################################
 # create a particular fesvr for bringup
 #########################################################################################
-$(fesvr_so): $(shell find -L $(FESVR_DIR)/fesvr/ -iname "*.scala" 2> /dev/null)
+$(fesvr_so): $(shell find -L $(FESVR_DIR)/fesvr/ -iname "*.h" 2> /dev/null) $(shell find -L $(FESVR_DIR)/fesvr/ -iname "*.cc" 2> /dev/null)
 	mkdir -p $(FESVR_DIR)/build
 	cd $(FESVR_DIR)/build && ./../configure --prefix=$(PWD) && make
 

@@ -1,0 +1,73 @@
+# Technology
+vlsi.core.technology_path: ["/PATH/TO/hammer-intech22-plugin"]
+vlsi.core.technology_path_meta: append
+vlsi.core.max_threads: 12
+# General inputs
+vlsi.inputs.supplies.power: [{name: "VDD", pin: "VDD"}]
+vlsi.inputs.supplies.VDD: "1.05 V"
+vlsi.inputs.power_spec_mode: auto
+vlsi.inputs.power_spec_type: cpf
+vlsi.inputs.mmmc_corners: [
+    {name: "psss_0.900v_125c", type: "setup", voltage: "0.90 V", temp: "125 C"},
+    {name: "pfff_1.050v_-40c", type: "hold", voltage: "1.05 V", temp: "-40 C"}
+]
+vlsi.inputs.clocks: [
+    {name: "clock", period: "2ns", uncertainty: "0.1ns"}
+]
+par.blockage_spacing: 2.0
+par.power_straps_mode: generate
+par.generate_power_straps_method: by_tracks
+par.generate_power_straps_options:
+    by_tracks:
+        strap_layers:
+            - M3
+            - M4
+            - M5
+            - M6
+            - M7
+            - M8
+        track_width: 6
+        track_width_M6: 10
+        track_spacing: 0
+        power_utilization: 0.05
+        power_utilization_M7: 1.0
+        power_utilization_M8: 1.0
+vlsi.inputs.placement_constraints:
+    - path: "BoomRocketTop"
+      type: "toplevel"
+      x: 0
+      y: 0
+      width: 2000.0
+      height: 2000.0
+      margins:
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+# SRAM Compiler options
+# TODO
+# Genus options
+vlsi.core.synthesis_tool: "genus"
+vlsi.core.synthesis_tool_path: ["hammer-cad-plugins/synthesis"]
+vlsi.core.synthesis_tool_path_meta: "append"
+synthesis.genus.version: "181"
+# Innovus options
+vlsi.core.par_tool: "innovus"
+vlsi.core.par_tool_path: ["hammer-cad-plugins/par"]
+vlsi.core.par_tool_path_meta: "append"
+par.innovus.version: "181"
+par.innovus.design_flow_effort: "standard"
+par.inputs.gds_merge: true
+# Calibre options
+# TODO there are no Calibre decks here
+# Submit command (use LSF)
+# vlsi.submit:
+#     command: "lsf"
+#     settings: [{"lsf": {
+#         "bsub_binary": "/tools/support/lsf/9.1/linux2.6-glibc2.3-x86_64/bin/bsub",
+#         "num_cpus": 4,
+#         "queue": "bora",
+#         "extra_args": ["-R", "span[hosts=1]"]
+#         }
+#     }]
+#     settings_meta: "append"

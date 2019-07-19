@@ -49,3 +49,12 @@
 [submodule "tools/beagle-fesvr"]
 	path = tools/beagle-fesvr
 	url = https://github.com/abejgonzalez/beagle-fesvr.git
+[submodule "vlsi/hammer"]
+	path = vlsi/hammer
+	url = git@github.com:ucb-bar/hammer.git
+[submodule "vlsi/hammer-cad-plugins"]
+	path = vlsi/hammer-cad-plugins
+	url = git@github.com:ucb-bar/hammer-cad-plugins
+[submodule "vlsi/hammer-intech22-plugin"]
+	path = vlsi/hammer-intech22-plugin
+	url = git@bwrcrepo.eecs.berkeley.edu:intech22/hammer-intech22-plugin.git

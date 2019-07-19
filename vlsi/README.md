@@ -4,6 +4,17 @@ This flow will not work without the necessary CAD and technology plugins for HAM
 
 If you are a UCB-affiliate, you may be able to acquire access to the tech-plugins.
 
-# INTECH22 Instructions
-`source sourceme.sh`
+# Initial Setup Instructions (For All technologies)
+Run the `init-vlsi.sh` script to pull correct versions of hammer, hammer-cad-plugins, and the hammer-tech-plugins
+```scripts/init-vlsi.sh TECH_NAME```
+
+# Initial Setup Instructions (For intech22)
+```scripts/init-vlsi.sh intech22```
 Copy the full path to `hammer-intech22-plugin` into the entry in `example.yml`
+
+# INTECH22 Instructions
+```source sourceme.sh``
+Source this to setup proper environment variables for hammer and intech22.`
+
+
+

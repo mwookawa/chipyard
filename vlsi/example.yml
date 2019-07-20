@@ -45,7 +45,9 @@ vlsi.inputs.placement_constraints:
         top: 0
         bottom: 0
 # SRAM Compiler options
-# TODO
+vlsi.core.sram_generator_tool: "sram_compiler"
+vlsi.core.sram_generator_tool_path: ["hammer-intech22-plugin"]
+vlsi.core.sram_generator_tool_path_meta: "append"
 # Genus options
 vlsi.core.synthesis_tool: "genus"
 vlsi.core.synthesis_tool_path: ["hammer-cad-plugins/synthesis"]

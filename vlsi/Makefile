@@ -15,11 +15,6 @@ sim_dir=$(abspath .)
 include $(base_dir)/variables.mk
 
 #########################################################################################
-# import other necessary rules and variables
-#########################################################################################
-include $(base_dir)/common.mk
-
-#########################################################################################
 # vlsi types and rules
 #########################################################################################
 
@@ -28,12 +23,19 @@ sim_name     ?= vcs
 tech_name    ?= intech22
 tech_dir     ?= $(vlsi_dir)/hammer-$(tech_name)-plugin/$(tech_name)
 SMEMS_COMP   ?= $(tech_dir)/sram-compiler.json
+SMEMS_CACHE  ?= $(tech_dir)/sram-cache.json
 SMEMS_HAMMER ?= $(build_dir)/$(long_name).mems.hammer.json
-MACROCOMPILER_MODE ?= -l $(SMEMS_COMP) --use-compiler -hir $(SMEMS_HAMMER)
+#MACROCOMPILER_MODE ?= -l $(SMEMS_COMP) --use-compiler -hir $(SMEMS_HAMMER)
+MACROCOMPILER_MODE ?= -l $(SMEMS_CACHE) -hir $(SMEMS_HAMMER)
 OBJ_DIR      ?= $(vlsi_dir)/build
 ENV_YML      ?= $(vlsi_dir)/bwrc-env.yml
 INPUT_CONFS  ?= example.yml $(dir $(tech_dir))/bwrc.yml
 HAMMER_EXEC  ?= ./example-vlsi
+
+#########################################################################################
+# import other necessary rules and variables
+#########################################################################################
+include $(base_dir)/common.mk
 
 ROCKET_SRC_DIR=$(ROCKETCHIP_DIR)/src/main/resources/vsrc
 
@@ -44,7 +46,9 @@ ROCKET_SRCS = \
 	$(ROCKET_SRC_DIR)/plusarg_reader.v \
 	$(ROCKET_SRC_DIR)/EICG_wrapper.v \
 
+.PHONY: verilog
 ALL_RTL = $(ROCKET_SRCS) $(TOP_FILE) $(TOP_SMEMS_FILE)
+verilog: $(ALL_RTL)
 
 CLOCK_DOMAINS = $(build_dir)/$(long_name).domains
 
@@ -53,6 +57,27 @@ default: all
 
 all: drc lvs
 
+##################################################### SRAMS ###########################################################
+
+SRAM_GENERATOR_CONF = $(build_dir)/sram_generator-input.yml
+SRAM_CONF=$(build_dir)/sram_generator-output.json
+
+## SRAM Generator
+.PHONY: sram_generator srams
+srams: sram_generator
+sram_generator: $(SRAM_CONF)
+
+# This should be built alongside $(SMEMS_FILE)
+$(SMEMS_HAMMER): $(SMEMS_FILE)
+
+$(SRAM_GENERATOR_CONF): $(SMEMS_HAMMER)
+	mkdir -p $(dir $@)
+	echo "vlsi.inputs.sram_parameters: '$(SMEMS_HAMMER)'" >> $@
+	echo "vlsi.inputs.sram_parameters_meta: [\"transclude\", \"json2list\"]">> $@
+
+$(SRAM_CONF): $(SRAM_GENERATOR_CONF)
+	cd $(vlsi_dir) && $(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$(INPUT_CONFS) $(SRAM_GENERATOR_CONF), -p $(x)) --obj_dir $(build_dir) sram_generator
+	cd $(vlsi_dir) && cp output.json $@
 
 ###################################################### SYN ############################################################
 

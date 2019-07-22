@@ -1,17 +1,17 @@
 #devtoolset 4 doesn't have all tools 2 has so add 2 first to get 4-versions of common tools
-#source /opt/rh/devtoolset-2/enable
-#source /opt/rh/devtoolset-4/enable
+source /opt/rh/devtoolset-2/enable
+source /opt/rh/devtoolset-4/enable
 #FLEXLM setup
-#source /tools/flexlm/flexlm.sh
+source /tools/flexlm/flexlm.sh
 
 #RISCV setup
 #export RISCV=/tools/projects/colins/eagleX/install
 #export PATH=$PATH:$RISCV/bin
 
 #Setup VCS
-#export PATH=/tools/synopsys/vcs/N-2017.12-SP1-1/bin:$PATH
-#export VCS_HOME=/tools/synopsys/vcs/N-2017.12-SP1-1/
-#export VCS_64=1
+export PATH=/tools/synopsys/vcs/N-2017.12-SP1-1/bin:$PATH
+export VCS_HOME=/tools/synopsys/vcs/N-2017.12-SP1-1/
+export VCS_64=1
 
 #Setup Hammer
 export HAMMER_HOME=`readlink -f hammer`

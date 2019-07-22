@@ -48,7 +48,6 @@ ROCKET_SRCS = \
 
 BEAGLE_SRCS = \
 	$(base_dir)/generators/beagle/src/main/resources/ClockReceiver.v \
-	$(base_dir)/generators/awl/src/main/resources/util.v \
 	$(base_dir)/generators/awl/src/main/resources/generic_transceiver.sv
 
 .PHONY: verilog

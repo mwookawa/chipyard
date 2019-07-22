@@ -46,12 +46,8 @@ ROCKET_SRCS = \
 	$(ROCKET_SRC_DIR)/plusarg_reader.v \
 	$(ROCKET_SRC_DIR)/EICG_wrapper.v \
 
-BEAGLE_SRCS = \
-	$(base_dir)/generators/beagle/src/main/resources/ClockReceiver.v \
-	$(base_dir)/generators/awl/src/main/resources/generic_transceiver.sv
-
 .PHONY: verilog
-ALL_RTL = $(ROCKET_SRCS) $(TOP_FILE) $(TOP_SMEMS_FILE) $(BEAGLE_SRCS)
+ALL_RTL = $(ROCKET_SRCS) $(TOP_FILE) $(TOP_SMEMS_FILE)
 verilog: $(ALL_RTL)
 
 CLOCK_DOMAINS = $(build_dir)/$(long_name).domains
@@ -87,13 +83,16 @@ $(SRAM_CONF): $(SRAM_GENERATOR_CONF)
 
 SYNTH_CONF = $(OBJ_DIR)/inputs.yml
 
-$(SYNTH_CONF): $(ALL_RTL)
+$(SYNTH_CONF):
 	mkdir -p $(dir $@)
 	echo "synthesis.inputs:" > $@
 	echo "  top_module: $(TOP)" >> $@
 	echo "  input_files:" >> $@
 	for x in $(ALL_RTL); do \
 		echo '    - "'$$x'"' >> $@; \
+	for x in $(extra_v_includes) `cat $(sim_top_blackboxes)`; do \
+		echo '    - "'$$x'"' >> $@; \
+	done
 	done
 
 GENERATED_CONFS=$(SYNTH_CONF) $(SRAM_CONF)

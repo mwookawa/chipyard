@@ -90,6 +90,9 @@ $(SYNTH_CONF):
 	echo "  input_files:" >> $@
 	for x in $(ALL_RTL); do \
 		echo '    - "'$$x'"' >> $@; \
+	for x in $(extra_v_includes) `cat $(sim_top_blackboxes)`; do \
+		echo '    - "'$$x'"' >> $@; \
+	done
 	done
 
 GENERATED_CONFS=$(SYNTH_CONF) $(SRAM_CONF)

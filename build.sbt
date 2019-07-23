@@ -114,7 +114,7 @@ lazy val beagleSerdes = conditionalDependsOn(project in file("generators/beagle-
   .settings(commonSettings)
 
 lazy val tapeout = conditionalDependsOn(project in file("./tools/barstools/tapeout/"))
-  .dependsOn(awl)
+  .dependsOn(awl, beagleSerdes)
   .settings(commonSettings)
 
 lazy val mdf = (project in file("./tools/barstools/mdf/scalalib/"))

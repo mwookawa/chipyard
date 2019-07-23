@@ -44,7 +44,6 @@ class BeagleBoomRocketSimConfig extends Config(
   new WithHierTiles ++
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
-  //new WithGenericSerdes ++
   new WithBeagleSerdes ++
   new boom.system.WithRenumberHarts ++
   // make tiles support different clocks
@@ -76,7 +75,6 @@ class BeagleBoomRocketHwachaSimConfig extends Config(
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
   new WithBeagleSerdes ++
-  //new WithGenericSerdes ++
   new boom.system.WithRenumberHarts ++
   // hwacha mixins
   new hwacha.DefaultHwachaConfig ++
@@ -109,7 +107,6 @@ class MegaBeagleConfig extends Config(
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
   new WithBeagleSerdes ++
-  //new WithGenericSerdes ++
 
   // note: THIS MUST BE ABOVE hwacha.DefaultHwachaConfig TO WORK
   new example.WithMultiRoCC ++ // attach particular RoCC accelerators based on the hart

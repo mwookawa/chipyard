@@ -32,7 +32,8 @@ HAMMER_EXEC        ?= ./example-vlsi
 #########################################################################################
 # general rules
 #########################################################################################
-ALL_RTL = $(TOP_FILE) $(TOP_SMEMS_FILE)
+ALL_RTL = $(TOP_FILE) $(TOP_SMEMS_FILE) $(extra_v_includes)
+extra_v_includes = $(gen_dir)/EICG_wrapper.v
 
 .PHONY: default verilog
 default: all
@@ -79,15 +80,12 @@ SYN_OUT_VLOG = $(OBJ_DIR)/syn-rundir/$(TOP).mapped.v
 SYN_OUT_JSON = $(OBJ_DIR)/syn-rundir/syn-output.json
 PAR_IN_JSON = $(OBJ_DIR)/par-input.json
 
-$(SYN_CONF): $(ALL_RTL)
+$(SYN_CONF): $(ALL_RTL) $(extra_v_includes) $(sim_top_blackboxes)
 	mkdir -p $(dir $@)
 	echo "synthesis.inputs:" > $@
 	echo "  top_module: $(TOP)" >> $@
 	echo "  input_files:" >> $@
-	for x in $(ALL_RTL); do \
-		echo '    - "'$$x'"' >> $@; \
-	done
-	for x in $(extra_v_includes) `cat $(sim_top_blackboxes)`; do \
+	for x in $(ALL_RTL) $(extra_v_includes) `cat $(sim_top_blackboxes)`; do \
 		echo '    - "'$$x'"' >> $@; \
 	done
 

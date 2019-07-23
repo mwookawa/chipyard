@@ -1,5 +1,5 @@
 # Technology
-vlsi.core.technology_path: ["/tools/B/abejgonza/beagle-work/beagle-chip/vlsi/hammer-intech22-plugin"]
+vlsi.core.technology_path: ["hammer-intech22-plugin"]
 vlsi.core.technology_path_meta: append
 vlsi.core.max_threads: 12
 # General inputs

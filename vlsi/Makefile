@@ -26,14 +26,14 @@ SMEMS_HAMMER       ?= $(build_dir)/$(long_name).mems.hammer.json
 MACROCOMPILER_MODE ?= -l $(SMEMS_CACHE) -hir $(SMEMS_HAMMER)
 OBJ_DIR            ?= $(vlsi_dir)/build
 ENV_YML            ?= $(vlsi_dir)/bwrc-env.yml
-INPUT_CONFS        ?= example.yml $(dir $(tech_dir))/bwrc.yml
+INPUT_CONFS        ?= example.yml $(dir $(tech_dir))/bwrc.yml $(base_dir)/generators/beagle-serdes/serdes_top_tapein_files/serdes_rx/serdes_rx.json $(base_dir)/generators/beagle-serdes/serdes_top_tapein_files/serdes_tx/serdes_tx.json $(base_dir)/generators/beagle-serdes/clock_receiver_tapein_files/DIFFAMP_SELFBIASED/DIFFAMP_SELFBIASED.json
 HAMMER_EXEC        ?= ./example-vlsi
 
 #########################################################################################
 # general rules
 #########################################################################################
 ALL_RTL = $(TOP_FILE) $(TOP_SMEMS_FILE) $(extra_v_includes)
-extra_v_includes = $(gen_dir)/EICG_wrapper.v
+extra_v_includes = $(build_dir)/EICG_wrapper.v
 
 .PHONY: default verilog
 default: all

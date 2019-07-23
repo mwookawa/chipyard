@@ -75,10 +75,6 @@ $(SRAM_CONF): $(SRAM_GENERATOR_CONF)
 #########################################################################################
 SYN_CONF = $(OBJ_DIR)/inputs.yml
 GENERATED_CONFS = $(SYN_CONF) $(SRAM_CONF)
-ALL_CONFS = $(INPUT_CONFS) $(GENERATED_CONFS)
-SYN_OUT_VLOG = $(OBJ_DIR)/syn-rundir/$(TOP).mapped.v
-SYN_OUT_JSON = $(OBJ_DIR)/syn-rundir/syn-output.json
-PAR_IN_JSON = $(OBJ_DIR)/par-input.json
 
 $(SYN_CONF): $(ALL_RTL) $(extra_v_includes) $(sim_top_blackboxes)
 	mkdir -p $(dir $@)
@@ -89,67 +85,15 @@ $(SYN_CONF): $(ALL_RTL) $(extra_v_includes) $(sim_top_blackboxes)
 		echo '    - "'$$x'"' >> $@; \
 	done
 
-.PHONY: syn synthesis
-syn: $(SYN_OUT_VLOG)
-synthesis: syn
+################################################ AUTO BUILD FLOW ######################################################
 
-$(SYN_OUT_VLOG) $(SYN_OUT_JSON): $(ENV_YML) $(ALL_CONFS) $(ALL_RTL)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$(ALL_CONFS), -p $(x)) --obj_dir $(OBJ_DIR) syn
+.PHONY: buildfile
+buildfile: $(OBJ_DIR)/hammer.d
 
-$(PAR_IN_JSON): $(SYN_OUT_JSON)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$(INPUT_CONFS) $<, -p $(x)) -o $@ syn_to_par
+$(OBJ_DIR)/hammer.d: $(HAMMER_D_DEPS)
+	$(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$(INPUT_CONFS) $(GENERATED_CONFS), -p $(x)) --obj_dir $(OBJ_DIR) build
 
-#########################################################################################
-# place and route (par/pnr/apr)
-#########################################################################################
-GDS = $(OBJ_DIR)/par-rundir/$(TOP).gds
-PAR_OUT_JSON = $(OBJ_DIR)/par-rundir/par-output.json
-DRC_IN_JSON = $(OBJ_DIR)/drc-input.json
-
-.PHONY: par place-and-route
-par: $(GDS)
-place-and-route: par
-
-$(GDS) $(PAR_OUT_JSON): $(PAR_IN_JSON) $(SYN_OUT_VLOG)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) -p $< --obj_dir $(OBJ_DIR) par
-
-$(DRC_IN_JSON): $(PAR_IN_JSON) $(PAR_OUT_JSON)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$^, -p $(x)) -o $@ --obj_dir $(OBJ_DIR) par_to_drc
-
-#########################################################################################
-# drc
-# TODO unimplemented
-#########################################################################################
-DRC_DB = $(OBJ_DIR)/drc-rundir/drc_results.db
-
-.PHONY: drc
-drc: $(DRC_DB)
-
-$(DRC_DB): $(DRC_IN_JSON) $(GDS)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) -p $< --obj_dir $(OBJ_DIR) drc
-
-#########################################################################################
-# lvs
-# TODO unimplemented
-#########################################################################################
-LVS_RPT = $(OBJ_DIR)/lvs-rundir/lvs_results.rpt
-LVS_IN_JSON = $(OBJ_DIR)/lvs-input.json
-
-.PHONY: lvs
-lvs: $(LVS_RPT)
-
-$(LVS_IN_JSON): $(PAR_IN_JSON) $(PAR_OUT_JSON)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) $(foreach x,$^, -p $(x)) -o $@ --obj_dir $(OBJ_DIR) par_to_lvs
-
-$(LVS_RPT): $(LVS_IN_JSON) $(GDS)
-	mkdir -p $(dir $@)
-	$(HAMMER_EXEC) -e $(ENV_YML) -p $< --obj_dir $(OBJ_DIR) lvs
+-include $(OBJ_DIR)/hammer.d
 
 #########################################################################################
 # general cleanup rule

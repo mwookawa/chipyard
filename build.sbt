@@ -85,7 +85,7 @@ lazy val example = conditionalDependsOn(project in file("generators/example"))
   .settings(commonSettings)
 
 lazy val beagle = conditionalDependsOn(project in file("generators/beagle"))
-  .dependsOn(example, boom, hwacha, sifive_blocks, systolicArray, awl, sifive_cache)
+  .dependsOn(example, boom, hwacha, sifive_blocks, systolicArray, awl, beagleSerdes, sifive_cache)
   .settings(commonSettings)
 
 lazy val utilities = conditionalDependsOn(project in file("generators/utilities"))
@@ -107,6 +107,10 @@ lazy val systolicArray = (project in file("generators/systolic-array"))
   .settings(commonSettings)
 
 lazy val awl = conditionalDependsOn(project in file("generators/awl"))
+  .settings(commonSettings)
+
+lazy val beagleSerdes = conditionalDependsOn(project in file("generators/beagle-serdes"))
+  .dependsOn(awl)
   .settings(commonSettings)
 
 lazy val tapeout = conditionalDependsOn(project in file("./tools/barstools/tapeout/"))

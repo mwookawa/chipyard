@@ -101,9 +101,9 @@ class BeagleChipTop(implicit val p: Parameters) extends RawModule
     val clock_rx = withClockAndReset(sys_clk, sys_rst) {
       Module(new ClockReceiver())
     }
-    clock_rx.io.VIP <> clock_io.p
-    clock_rx.io.VIN <> clock_io.n
-    clock_rx.io.VOBUF
+    clock_rx.io.inp <> clock_io.p
+    clock_rx.io.inn <> clock_io.n
+    clock_rx.io.out
   }
   sys.diff_clks <> diff_clks_single
 
@@ -126,9 +126,9 @@ class BeagleChipTop(implicit val p: Parameters) extends RawModule
     val clock_rx = withClockAndReset(sys_clk, sys_rst) {
       Module(new ClockReceiver())
     }
-    clock_rx.io.VIP <> clock_io.p
-    clock_rx.io.VIN <> clock_io.n
-    clock_rx.io.VOBUF
+    clock_rx.io.inp <> clock_io.p
+    clock_rx.io.inn <> clock_io.n
+    clock_rx.io.out
   }
 
   sys.hbwif_clks <> hbwif_clks

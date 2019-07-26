@@ -44,7 +44,6 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
       beatBytes = p(ExtMem).get.master.beatBytes,
       trackCorruption = false)))
 
-  println("Harnessside")
   val lbwif = LazyModule(new TLSerdesser(
     w = p(LbwifBitWidth),
     clientParams = TLClientParameters(

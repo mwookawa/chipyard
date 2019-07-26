@@ -37,7 +37,7 @@
 [submodule "sims/firesim"]
 	path = sims/firesim
 	url = https://github.com/firesim/firesim.git
-[submodule "generators/sifive-cache"]
+[submodule "generators/block-inclusivecache-sifive"]
 	path = generators/sifive-cache
 	url = https://github.com/sifive/block-inclusivecache-sifive.git
 [submodule "toolchains/riscv-tools"]

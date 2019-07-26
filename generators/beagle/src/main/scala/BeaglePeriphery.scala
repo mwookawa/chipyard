@@ -260,7 +260,6 @@ trait HasPeripheryBeagle
     sourceId = IdRange(0, (1 << 4)),
     requestFifo = true)
 
-  println("Chipside")
   val lbwif = LazyModule(new TLSerdesser(
     w=p(LbwifBitWidth),
     clientParams=ctrlParams,

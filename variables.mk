@@ -80,7 +80,7 @@ ifeq ($(SUB_PROJECT),beagle)
 	MODEL             ?= BeagleTestHarness
 	VLOG_MODEL        ?= TestHarness
 	MODEL_PACKAGE     ?= beagle
-	CONFIG            ?= BeagleBoomRocketSimConfig
+	CONFIG            ?= MegaBeagleConfig
 	CONFIG_PACKAGE    ?= beagle
 	GENERATOR_PACKAGE ?= beagle
 	TB                ?= TestDriver
@@ -197,5 +197,5 @@ sim_vsrcs = \
 #########################################################################################
 # assembly/benchmark variables
 #########################################################################################
-timeout_cycles = 10000000
-bmark_timeout_cycles = 100000000
+timeout_cycles = 1000000000
+bmark_timeout_cycles = 10000000000

@@ -58,3 +58,6 @@
 [submodule "vlsi/hammer-intech22-plugin"]
 	path = vlsi/hammer-intech22-plugin
 	url = git@bwrcrepo.eecs.berkeley.edu:intech22/hammer-intech22-plugin.git
+[submodule "generators/beagle-serdes"]
+	path = generators/beagle-serdes
+	url = git@bwrcrepo.eecs.berkeley.edu:beagle/beagle_serdes.git

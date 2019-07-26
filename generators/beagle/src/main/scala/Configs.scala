@@ -23,6 +23,8 @@ import boom.system.{BoomTilesKey}
 
 import systolic.{SystolicArray, SystolicArrayKey, SystolicArrayConfig, Dataflow}
 
+import beagle.serdes._
+
 // -------
 // CONFIGS
 // -------
@@ -42,7 +44,7 @@ class BeagleBoomRocketSimConfig extends Config(
   new WithHierTiles ++
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
-  new WithGenericSerdes ++
+  new WithBeagleSerdes ++
   new boom.system.WithRenumberHarts ++
   // make tiles support different clocks
   new boom.system.WithAsynchronousBoomTiles(4, 4) ++
@@ -72,7 +74,7 @@ class BeagleBoomRocketHwachaSimConfig extends Config(
   new WithHierTiles ++
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
-  new WithGenericSerdes ++
+  new WithBeagleSerdes ++
   new boom.system.WithRenumberHarts ++
   // hwacha mixins
   new hwacha.DefaultHwachaConfig ++
@@ -104,7 +106,7 @@ class MegaBeagleConfig extends Config(
   new WithJtagDTM ++
   new WithNMemoryChannels(2) ++
   new WithBeagleSerdesChanges ++
-  new WithGenericSerdes ++
+  new WithBeagleSerdes ++
 
   // note: THIS MUST BE ABOVE hwacha.DefaultHwachaConfig TO WORK
   new example.WithMultiRoCC ++ // attach particular RoCC accelerators based on the hart

@@ -17,7 +17,7 @@ import sifive.blocks.devices.jtag._
 import hbwif.tilelink._
 import hbwif._
 
-import hwacha.{Hwacha}
+import hwacha.{Hwacha, HwachaStagesDFMA, HwachaStagesSFMA, HwachaStagesHFMA, HwachaStagesIMul, HwachaConfPrec}
 
 import boom.system.{BoomTilesKey}
 import boom.exu.{IssueParams}
@@ -25,7 +25,7 @@ import boom.ifu.{FtqParameters}
 import boom.bpu.{GShareParameters, BoomBTBParameters}
 import boom.common._
 
-import systolic.{SystolicArray, SystolicArrayKey, SystolicArrayConfig, Dataflow}
+import systolic.{SystolicArray, SystolicArrayConfig, Dataflow}
 
 import example.{MultiRoCCKey}
 
@@ -57,6 +57,14 @@ class WithBeagleChanges extends Config((site, here, up) => {
   case CacheBlockStriping => 4
   case LbwifBitWidth => 4
   case PeripheryBeagleKey => BeagleParams(scrAddress = 0x110000)
+  case RocketTilesKey => up(RocketTilesKey, site) map { r =>
+    r.copy(core = r.core.copy(fpu = r.core.fpu.map(_.copy(sfmaLatency = 4, dfmaLatency = 5))))
+  }
+  case HwachaStagesDFMA => 5
+  case HwachaStagesSFMA => 4
+  case HwachaStagesHFMA => 3
+  case HwachaStagesIMul => 4
+  case HwachaConfPrec => true
 })
 
 /**
@@ -121,25 +129,29 @@ class WithBeagleSerdesChanges extends Config((site, here, up) => {
 /**
  * Systolic Array Params
  */
-class WithSystolicParams extends Config((site, here, up) => {
-  case SystolicArrayKey =>
-    SystolicArrayConfig(
-      tileRows = 1,
-      tileColumns = 1,
-      meshRows = 16,
-      meshColumns = 16,
-      ld_str_queue_length = 10,
-      ex_queue_length = 10,
-      sp_banks = 4,
-      sp_bank_entries = 256 * 1024 * 8 / (4 * 16 * 8), // has to be a multiply of meshRows*tileRows
-      sp_width = 8 * 16, // has to be meshRows*tileRows*dataWidth // TODO should this be changeable?
-      shifter_banks = 1, // TODO add separate parameters for left and up shifter banks
-      depq_len = 65536,
-      dataflow = Dataflow.BOTH,
-      acc_rows = 64 * 1024 * 8 / (16 * 32),
-      mem_pipeline = 1
-    )
-})
+object SystolicConfigs {
+  val defaultConfig = SystolicArrayConfig(
+    tileRows = 1,
+    tileColumns = 1,
+    meshRows = 16,
+    meshColumns = 16,
+    ld_str_queue_length = 10,
+    ex_queue_length = 10,
+    sp_banks = 4,
+    sp_bank_entries = 256 * 1024 * 8 / (4 * 16 * 8), // has to be a multiply of meshRows*tileRows
+    sp_width = 8 * 16, // has to be meshRows*tileRows*dataWidth // TODO should this be changeable?
+    shifter_banks = 1, // TODO add separate parameters for left and up shifter banks
+    depq_len = 65536,
+    dataflow = Dataflow.BOTH,
+    acc_rows = 64 * 1024 * 8 / (16 * 32),
+    mem_pipeline = 1,
+    dma_maxbytes = 128, // TODO get this from cacheblockbytes
+    dma_buswidth = 128, // TODO get this from SystemBusKey
+    inputType = SInt(8.W),
+    outputType = SInt(19.W),
+    accType = SInt(32.W)
+  )
+}
 
 /**
  * Mixin to add SystolicArrays to cores
@@ -159,7 +171,7 @@ class WithMultiRoCCSystolic(harts: Int*) extends Config((site, here, up) => {
       (i -> Seq((p: Parameters) => {
         implicit val q = p
         implicit val v = implicitly[ValName]
-        LazyModule(new SystolicArray(SInt(8.W), SInt(16.W), SInt(32.W), OpcodeSet.custom3)).suggestName("systolic_array")
+        LazyModule(new SystolicArray(OpcodeSet.custom3, SystolicConfigs.defaultConfig)).suggestName("systolic_array")
       }))
     }
   }
@@ -211,7 +223,7 @@ class WithMegaBeagleBooms extends Config((site, here, up) => {
          numLdqEntries = 24,
          numStqEntries = 24,
          maxBrCount = 16,
-         useNewFetchBuffer = false,
+         useNewFetchBuffer = true,
          numFetchBufferEntries = 24,
          ftq = FtqParameters(nEntries=32),
          btb = BoomBTBParameters(btbsa=true, densebtb=false, nSets=512, nWays=4, nRAS=16, tagSz=13),

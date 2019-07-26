@@ -1,10 +1,10 @@
 `ifndef SYNTHESIS
 module DIFFAMP_SELFBIASED(
-  input VIN,
-  input VIP,
-  output VOBUF );
+  input inn,
+  input inp,
+  output out );
 
-  assign VOBUF = (VIN ^ VIP) ? VIP : 1'b0;
+  assign out = (inn ^ inp) ? inp : 1'b0;
 
 endmodule
 `endif

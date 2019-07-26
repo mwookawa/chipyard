@@ -1,5 +1,5 @@
 `ifndef SYNTHESIS
-module ClockReceiverVerilogModule(
+module DIFFAMP_SELFBIASED(
   input VIN,
   input VIP,
   output VOBUF );

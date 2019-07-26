@@ -27,14 +27,10 @@ vlsi.inputs.clocks: [
   {name: "hbwif_ref0_clk", path: "BeagleChipTop/DIFFAMP_SELFBIASED_1/out", period: "1.142ns", uncertainty: ".1142ns"},
   {name: "hbwif_ref1_clk", path: "BeagleChipTop/DIFFAMP_SELFBIASED_2/out", period: "1.142ns", uncertainty: ".1142ns"},
   # hbwif out (within each lane)
-  {name: "hbwif_lane0_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
-  {name: "hbwif_lane0_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
-  {name: "hbwif_lane1_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
-  {name: "hbwif_lane1_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"}
-]
-vlsi.inputs.custom_sdc_constraints: [
-  # Asynchronous clock groups
-  "set_clock_groups -asynchronous {uncore_clk} {bh_clk} {rs_clk} {digital_single_clk} {digital_diff_clk} {hbwif_ref0_clk} {hbwif_ref1_clk} {hbwif_lane0_rx_clk_out} {hbwif_lane0_tx_clk_out} {hbwif_lane1_rx_clk_out} {hbwif_lane1_tx_clk_out}"
+  {name: "hbwif_lane0_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns"},
+  {name: "hbwif_lane0_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns"},
+  {name: "hbwif_lane1_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns"},
+  {name: "hbwif_lane1_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns"}
 ]
 par.blockage_spacing: 2.0
 par.power_straps_mode: generate

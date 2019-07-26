@@ -13,12 +13,6 @@
 [submodule "tools/firrtl"]
 	path = tools/firrtl
 	url = https://github.com/freechipsproject/firrtl
-[submodule "riscv-tools"]
-	path = toolchains/riscv-tools
-	url = https://github.com/riscv/riscv-tools.git
-[submodule "esp-tools"]
-	path = toolchains/esp-tools
-	url = https://github.com/ucb-bar/esp-tools.git
 [submodule "tools/torture"]
 	path = tools/torture
 	url = https://github.com/ucb-bar/riscv-torture.git
@@ -46,18 +40,27 @@
 [submodule "generators/block-inclusivecache-sifive"]
 	path = generators/sifive-cache
 	url = https://github.com/sifive/block-inclusivecache-sifive.git
-[submodule "tools/beagle-fesvr"]
-	path = tools/beagle-fesvr
-	url = https://github.com/abejgonzalez/beagle-fesvr.git
+[submodule "toolchains/riscv-tools"]
+	path = toolchains/riscv-tools
+	url = https://github.com/freechipsproject/rocket-tools.git
+[submodule "toolchains/esp-tools"]
+	path = toolchains/esp-tools
+	url = https://github.com/ucb-bar/esp-tools.git
 [submodule "vlsi/hammer"]
 	path = vlsi/hammer
-	url = git@github.com:ucb-bar/hammer.git
+	url = https://github.com/ucb-bar/hammer.git
 [submodule "vlsi/hammer-cad-plugins"]
 	path = vlsi/hammer-cad-plugins
-	url = git@github.com:ucb-bar/hammer-cad-plugins
+	url = https://github.com/ucb-bar/hammer-cad-plugins.git
 [submodule "vlsi/hammer-intech22-plugin"]
 	path = vlsi/hammer-intech22-plugin
 	url = git@bwrcrepo.eecs.berkeley.edu:intech22/hammer-intech22-plugin.git
 [submodule "generators/beagle-serdes"]
 	path = generators/beagle-serdes
 	url = git@bwrcrepo.eecs.berkeley.edu:beagle/beagle_serdes.git
+[submodule "tools/beagle-fesvr"]
+	path = tools/beagle-fesvr
+	url = https://github.com/abejgonzalez/beagle-fesvr.git
+[submodule "tests/riscv-code-constructor"]
+	path = tests/riscv-code-constructor
+	url = git@github.com:abejgonzalez/riscv-code-constructor.git

@@ -12,7 +12,29 @@ vlsi.inputs.mmmc_corners: [
     {name: "pfff_1.050v_-40c", type: "hold", voltage: "1.05 V", temp: "-40 C"}
 ]
 vlsi.inputs.clocks: [
-    {name: "clock", period: "2ns", uncertainty: "0.1ns"}
+  # slow clock
+  {name: "digital_single_clk", path: "BeagleChipTop/single_clks_0", period: "2ns", uncertainty: ".2ns"},
+  # fast clock
+  {name: "digital_diff_clk", path: "BeagleChipTop/DIFFAMP_SELFBIASED/out", period: "1ns", uncertainty: ".1ns"},
+  # output of the clock muxes
+  # uncore
+  {name: "uncore_clk", path: "BeagleChipTop/sys/ClockMutexMux_3/io_clockOut", period: "2ns", uncertainty: ".2ns"},
+  # boom + hwacha tile
+  {name: "bh_clk", path: "BeagleChipTop/sys/ClockMutexMux_4/io_clockOut", period: "1ns", uncertainty: ".1ns"},
+  # rocket + systolic tile
+  {name: "rs_clk", path: "BeagleChipTop/sys/ClockMutexMux_5/io_clockOut", period: "2ns", uncertainty: ".2ns"},
+  # # hbwif in (ref)
+  {name: "hbwif_ref0_clk", path: "BeagleChipTop/DIFFAMP_SELFBIASED_1/out", period: "1.142ns", uncertainty: ".1142ns"},
+  {name: "hbwif_ref1_clk", path: "BeagleChipTop/DIFFAMP_SELFBIASED_2/out", period: "1.142ns", uncertainty: ".1142ns"},
+  # hbwif out (within each lane)
+  {name: "hbwif_lane0_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
+  {name: "hbwif_lane0_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_0/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
+  {name: "hbwif_lane1_rx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_rx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"},
+  {name: "hbwif_lane1_tx_clk_out", path: "pin:BeagleChipTop/hbwif_/laneModules_1/txrxss/txrx/clock_tx_div", period: "1.142ns", uncertainty: ".1142ns", group: "hbwif"}
+]
+vlsi.inputs.custom_sdc_constraints: [
+  # Asynchronous clock groups
+  "set_clock_groups -asynchronous {uncore_clk} {bh_clk} {rs_clk} {digital_single_clk} {digital_diff_clk} {hbwif_ref0_clk} {hbwif_ref1_clk} {hbwif_lane0_rx_clk_out} {hbwif_lane0_tx_clk_out} {hbwif_lane1_rx_clk_out} {hbwif_lane1_tx_clk_out}"
 ]
 par.blockage_spacing: 2.0
 par.power_straps_mode: generate

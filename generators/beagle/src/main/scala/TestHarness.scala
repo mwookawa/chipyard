@@ -18,7 +18,8 @@ import freechips.rocketchip.jtag.{JTAGIO}
 
 import testchipip.{SerialAdapter, SimSerial, TLSerdesser}
 
-import hbwif.tilelink.{HbwifTLKey}
+import hbwif.tilelink.{HbwifTLKey, HbwifNumLanes, TLController, TLControllerPusher, TLControllerWritePattern, GenericHbwifModule}
+import hbwif.{ClockToDifferential}
 
 class BeagleTestHarness(implicit val p: Parameters) extends Module
 {
@@ -37,6 +38,12 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
 {
   val adapter = LazyModule(new SerialAdapter(1 << 4))
 
+  val harness_rams = p(HbwifTLKey).managerAddressSet.map(addrSet =>
+    LazyModule(new TLTestRAM(
+      address = addrSet,
+      beatBytes = p(ExtMem).get.master.beatBytes,
+      trackCorruption = false)))
+
   val lbwif = LazyModule(new TLSerdesser(
     w = p(LbwifBitWidth),
     clientParams = TLClientParameters(
@@ -50,15 +57,34 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
       fifoId = Some(0),
       supportsGet        = TransferSizes(1, p(CacheBlockBytes)),
       supportsPutFull    = TransferSizes(1, p(CacheBlockBytes)),
-      supportsPutPartial = TransferSizes(1, p(CacheBlockBytes))),
+      supportsPutPartial = TransferSizes(1, p(CacheBlockBytes)),
+      supportsAcquireT   = TransferSizes(1, p(CacheBlockBytes)),
+      supportsAcquireB   = TransferSizes(1, p(CacheBlockBytes)),
+      supportsArithmetic = TransferSizes(1, p(CacheBlockBytes))),
      beatBytes = p(ExtMem).get.master.beatBytes,
-     endSinkId = 0))
+     endSinkId = 1<<6))
 
-  val harness_rams = p(HbwifTLKey).managerAddressSet.map(addrSet =>
-    LazyModule(new TLTestRAM(
-      address = addrSet,
-      beatBytes = p(ExtMem).get.master.beatBytes,
-      trackCorruption = false)))
+  val hbwif = LazyModule(new GenericHbwifModule()(p.alterPartial({
+    case HbwifTLKey => {
+      p(HbwifTLKey).copy(
+        numXact = (1 << 13),
+        clientPort = true,
+        clientTLUH = false,
+        clientTLC = false,
+        managerTLUH = false,
+        managerTLC = false)
+    }
+  })))
+
+  val hbwif_xbar = LazyModule(new TLXbar)
+
+  val hbwif_nodes = new {
+    val config = TLClientHelper("SimHbwifConfigPusher")
+    val manager = TLClientHelper("SimHbwifManager", n = p(HbwifNumLanes))
+    hbwif_xbar.node := config
+    hbwif.managerNode :*= manager
+  }
+  hbwif.configNodes.foreach { _ := hbwif_xbar.node }
 
   val mem_xbar = LazyModule(new TLXbar)
   harness_rams.foreach { ram =>
@@ -66,6 +92,11 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
   }
 
   lbwif.managerNode := TLBuffer() := adapter.node
+
+  // connect the hbwif/lbwif to the ram
+  for (i <- 0 until p(HbwifNumLanes)) {
+    mem_xbar.node := hbwif.clientNode
+  }
   mem_xbar.node := TLBuffer() := lbwif.clientNode
 
   lazy val module = new LazyModuleImp(this) {
@@ -75,11 +106,32 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
 
     val dut = Module(new BeagleChipTop)
 
+    // Setup the HBWIF
+    hbwif.module.hbwifResets.foreach { _ := reset }
+    hbwif.module.hbwifRefClocks.foreach { _ := clock }
+    hbwif.module.resetAsync := reset
+
+    private val settings = Seq(
+      TLControllerWritePattern("bert_enable", 0),
+      TLControllerWritePattern("mem_mode_enable", 1))
+
+    private val (out, edge) = hbwif_nodes.config.out.head
+    val hbwifPusher = Module(new TLControllerPusher(edge,
+      hbwif.module.addrmaps.zip(p(HbwifTLKey).configAddressSets).flatMap {
+          case (m, a) => TLController.toPattern(m, a.base, settings)
+      }
+    ))
+    hbwifPusher.io.start := Timer(50)
+    out <> hbwifPusher.io.tl
+
+    hbwif_nodes.manager.out.foreach { _._1.tieoff() }
+    // DONE: Setup the HBWIF
+
     val harness_clk_divider = Module(new testchipip.ClockDivider(2))
     harness_clk_divider.io.divisor := 1.U
     val harness_slow_clk = harness_clk_divider.io.clockOut
 
-    val harness_fast_clk = hbwif.ClockToDifferential(clock)
+    val harness_fast_clk = ClockToDifferential(clock)
 
     dut.reset := reset
     dut.boot := true.B
@@ -97,7 +149,8 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     dut.spi  := DontCare
     dut.uart := DontCare
     dut.jtag := DontCare
-    dut.hbwif := DontCare
+    dut.hbwif.tx <> hbwif.module.rx
+    dut.hbwif.rx <> hbwif.module.tx
     dut.hbwif_diff_clks.foreach { _ := DontCare }
     dut.hbwif_diff_clks.foreach { diff_clk =>
       attach(diff_clk.p, harness_fast_clk.p)
@@ -161,5 +214,59 @@ class BeagleTestHarnessInner(implicit p: Parameters) extends LazyModule
     // connect the exit signal
 
     io.success := sim.io.exit || jtag_success
+  }
+}
+
+object TLClientHelper {
+  def apply(name: String, sourceId: IdRange = IdRange(0,1), n: Int = 1)(implicit valName: ValName): TLClientNode = {
+    val params = TLClientPortParameters(Seq(TLClientParameters(name, sourceId)))
+    TLClientNode(Seq.fill(n)(params))
+  }
+}
+
+object Timer {
+  def apply(init: Int): Bool = {
+    val count = RegInit(init.U)
+    val done = (count === 0.U)
+    when (!done) {
+      count := count - 1.U
+    }
+    done
+  }
+}
+
+class TLSinkSetter(endSinkId: Int)(implicit p: Parameters) extends LazyModule {
+  val node = TLAdapterNode(managerFn = { m => m.copy(endSinkId = endSinkId) })
+  lazy val module = new LazyModuleImp(this) {
+    // FIXME: bulk connect
+    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
+      out.valid := in.valid
+      out.bits := in.bits
+      in.ready := out.ready
+    }
+
+    (node.in zip node.out) foreach { case ((in, edgeIn), (out, edgeOut)) =>
+      connect(out.a, in.a) // out.a <> in .a
+      connect(in.d, out.d) // in .d <> out.d
+      if (edgeOut.manager.anySupportAcquireB && edgeOut.client.anySupportProbe) {
+        connect(in.b, out.b) // in .b <> out.b
+        connect(out.c, in.c) // out.c <> in .c
+        connect(out.e, in.e) // out.e <> in .e
+      } else {
+        in.b.valid := false.B
+        in.c.ready := true.B
+        in.e.ready := true.B
+        out.b.ready := true.B
+        out.c.valid := false.B
+        out.e.valid := false.B
+      }
+    }
+  }
+}
+
+object TLSinkSetter {
+  def apply(endSinkId: Int)(implicit p: Parameters): TLNode = {
+    val widener = LazyModule(new TLSinkSetter(endSinkId))
+    widener.node
   }
 }

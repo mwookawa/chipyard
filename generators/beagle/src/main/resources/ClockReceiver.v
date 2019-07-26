@@ -1,10 +1,10 @@
 `ifndef SYNTHESIS
-module ClockReceiverVerilogModule(
-  input VIN,
-  input VIP,
-  output VOBUF );
+module DIFFAMP_SELFBIASED(
+  input inn,
+  input inp,
+  output out );
 
-  assign VOBUF = (VIN ^ VIP) ? VIP : 1'b0;
+  assign out = (inn ^ inp) ? inp : 1'b0;
 
 endmodule
 `endif

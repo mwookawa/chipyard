@@ -38,18 +38,19 @@ par.generate_power_straps_method: by_tracks
 par.generate_power_straps_options:
     by_tracks:
         strap_layers:
-            - M3
-            - M4
-            - M5
-            - M6
-            - M7
-            - M8
+            - m2
+            - m3
+            - m4
+            - m5
+            - m6
+            - m7
+            - m8
         track_width: 6
-        track_width_M6: 10
+        track_width_m6: 10
         track_spacing: 0
         power_utilization: 0.05
-        power_utilization_M7: 1.0
-        power_utilization_M8: 1.0
+        power_utilization_m7: 1.0
+        power_utilization_m8: 1.0
 vlsi.inputs.placement_constraints:
     - path: "BoomRocketTop"
       type: "toplevel"

@@ -1,4 +1,4 @@
-This is the starting point for a vlsi flow from this repository.
+BThis is the starting point for a vlsi flow from this repository.
 
 This flow will not work without the necessary CAD and technology plugins for HAMMER.
 
@@ -11,8 +11,6 @@ Run the `init-vlsi.sh` script to pull correct versions of hammer, hammer-cad-plu
 
 # Initial Setup Instructions (For intech22)
 ```scripts/init-vlsi.sh intech22```
-
-Copy the full path to `hammer-intech22-plugin` into the entry in `example.yml`
 
 # INTECH22 Instructions
 ```source sourceme.sh```

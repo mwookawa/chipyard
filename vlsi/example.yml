@@ -4,6 +4,7 @@ vlsi.core.technology_path_meta: append
 vlsi.core.max_threads: 8
 # General inputs
 vlsi.inputs.supplies.power: [{name: "VDD", pin: "VDD"}]
+vlsi.inputs.supplies.ground: [{name: "VSS", pin: "VSS"}]
 vlsi.inputs.supplies.VDD: "1.05 V"
 vlsi.inputs.power_spec_mode: auto
 vlsi.inputs.power_spec_type: cpf
@@ -51,6 +52,8 @@ par.generate_power_straps_options:
         power_utilization: 0.05
         power_utilization_m7: 1.0
         power_utilization_m8: 1.0
+        pin_layers:
+            - m8
 vlsi.inputs.placement_constraints:
     - path: "BoomRocketTop"
       type: "toplevel"
@@ -78,7 +81,7 @@ synthesis.genus.version: "181"
 vlsi.core.par_tool: "innovus"
 vlsi.core.par_tool_path: ["hammer-cad-plugins/par"]
 vlsi.core.par_tool_path_meta: "append"
-par.innovus.version: "181"
+par.innovus.version: "191"
 par.innovus.design_flow_effort: "standard"
 par.inputs.gds_merge: true
 # Calibre options

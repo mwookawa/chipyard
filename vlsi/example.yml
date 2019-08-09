@@ -55,7 +55,7 @@ par.generate_power_straps_options:
         pin_layers:
             - m8
 vlsi.inputs.placement_constraints:
-    - path: "BoomRocketTop"
+    - path: "BeagleChipTop"
       type: "toplevel"
       x: 0
       y: 0

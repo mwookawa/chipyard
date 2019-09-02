@@ -288,7 +288,7 @@ jobs:
                 command: .circleci/do-firesim-build.sh firesim
                 no_output_timeout: 120m
             - save_cache:
-                key: example-{{ .Branch }}-{{ .Revision }}
+                key: firesim-{{ .Branch }}-{{ .Revision }}
                 paths:
                     - "/home/riscvuser/project"
 
@@ -413,6 +413,31 @@ jobs:
                 name: Run hwacha tests
                 command: .circleci/run-tests.sh hwacha
 
+    firesim-run-tests:
+        docker:
+            - image: riscvboom/riscvboom-images:0.0.10
+        environment:
+            JVM_OPTS: -Xmx3200m # Customize the JVM maximum heap limit
+            TERM: dumb
+        steps:
+            - checkout
+            - run:
+                name: Create hash of toolchains
+                command: |
+                    .circleci/create-hash.sh
+            - restore_cache:
+                keys:
+                    - riscv-tools-installed-v1-{{ checksum "../riscv-tools.hash" }}
+            - restore_cache:
+                keys:
+                    - firesim-{{ .Branch }}-{{ .Revision }}
+            - restore_cache:
+                keys:
+                    - verilator-installed-v3-{{ checksum "sims/verilator/verilator.mk" }}
+            - run:
+                name: Run FireSim tests
+                command: .circleci/run-firesim-tests.sh firesim
+
 # Order and dependencies of jobs to run
 workflows:
     version: 2
@@ -496,3 +521,6 @@ workflows:
             #- hwacha-run-tests:
             #    requires:
             #        - prepare-hwacha
+            - firesim-run-tests:
+                requires:
+                    - prepare-firesim

@@ -33,7 +33,7 @@ LOCAL_ESP_DIR=$HOME/esp-tools-install
 LOCAL_CHIPYARD_DIR=$LOCAL_CHECKOUT_DIR
 LOCAL_VERILATOR_DIR=$HOME/verilator
 LOCAL_SIM_DIR=$LOCAL_CHIPYARD_DIR/sims/verilator
-REMOTE_FIRESIM_DIR=$LOCAL_CHIPYARD_DIR/sims/firesim/sim
+LOCAL_FIRESIM_DIR=$LOCAL_CHIPYARD_DIR/sims/firesim/sim
 
 # key value store to get the build strings
 declare -A mapping

@@ -24,6 +24,7 @@ REMOTE_ESP_DIR=$REMOTE_WORK_DIR/esp-tools-install
 REMOTE_CHIPYARD_DIR=$REMOTE_WORK_DIR/chipyard
 REMOTE_VERILATOR_DIR=$REMOTE_WORK_DIR/verilator
 REMOTE_SIM_DIR=$REMOTE_CHIPYARD_DIR/sims/verilator
+REMOTE_FIRESIM_DIR=$REMOTE_CHIPYARD_DIR/sims/firesim/sim
 
 # local variables (aka within the docker container)
 LOCAL_CHECKOUT_DIR=$HOME/project

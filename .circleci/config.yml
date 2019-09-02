@@ -284,7 +284,7 @@ jobs:
                 keys:
                     - verilator-installed-v3-{{ checksum "sims/verilator/verilator.mk" }}
             - run:
-                name: Building firesim MIDAS simulator using Verilator
+                name: Building FireSim MIDAS simulator using Verilator
                 command: .circleci/do-firesim-build.sh
                 no_output_timeout: 120m
             - save_cache:

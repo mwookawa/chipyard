@@ -410,55 +410,55 @@ workflows:
             - install-verilator
 
             # Prepare the verilator builds
-            - prepare-example:
-                requires:
-                    - install-riscv-toolchain
-                    - install-verilator
+            #- prepare-example:
+            #    requires:
+            #        - install-riscv-toolchain
+            #        - install-verilator
 
-            - prepare-boomrocketexample:
-                requires:
-                    - install-riscv-toolchain
-                    - install-verilator
+            #- prepare-boomrocketexample:
+            #    requires:
+            #        - install-riscv-toolchain
+            #        - install-verilator
 
-            - prepare-boom:
-                requires:
-                    - install-riscv-toolchain
-                    - install-verilator
+            #- prepare-boom:
+            #    requires:
+            #        - install-riscv-toolchain
+            #        - install-verilator
 
-            - prepare-rocketchip:
-                requires:
-                    - install-riscv-toolchain
-                    - install-verilator
+            #- prepare-rocketchip:
+            #    requires:
+            #        - install-riscv-toolchain
+            #        - install-verilator
 
-            - prepare-blockdevrocketchip:
-                requires:
-                    - install-riscv-toolchain
-                    - install-verilator
+            #- prepare-blockdevrocketchip:
+            #    requires:
+            #        - install-riscv-toolchain
+            #        - install-verilator
 
-            - prepare-hwacha:
-                requires:
-                    - install-esp-toolchain
-                    - install-verilator
+            #- prepare-hwacha:
+            #    requires:
+            #        - install-esp-toolchain
+            #        - install-verilator
 
             # Run the respective tests
 
             # Run the example tests
-            - example-run-tests:
-                requires:
-                    - prepare-example
+            #- example-run-tests:
+            #    requires:
+            #        - prepare-example
 
-            - boomrocketexample-run-tests:
-                requires:
-                    - prepare-boomrocketexample
+            #- boomrocketexample-run-tests:
+            #    requires:
+            #        - prepare-boomrocketexample
 
-            - boom-run-tests:
-                requires:
-                    - prepare-boom
+            #- boom-run-tests:
+            #    requires:
+            #        - prepare-boom
 
-            - rocketchip-run-tests:
-                requires:
-                    - prepare-rocketchip
+            #- rocketchip-run-tests:
+            #    requires:
+            #        - prepare-rocketchip
 
-            - hwacha-run-tests:
-                requires:
-                    - prepare-hwacha
+            #- hwacha-run-tests:
+            #    requires:
+            #        - prepare-hwacha

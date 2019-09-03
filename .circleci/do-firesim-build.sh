@@ -41,6 +41,7 @@ else
     copy $LOCAL_RISCV_DIR/ $SERVER:$REMOTE_RISCV_DIR
 fi
 
+# Build MIDAS-level verilator sim
 FIRESIM_VARS="${mapping[$1]}"
 run "export FIRESIM_ENV_SOURCED=1; make -C $REMOTE_FIRESIM_DIR clean"
 run "export RISCV=\"$TOOLS_DIR\"; export LD_LIBRARY_PATH=\"$LD_LIB_DIR\"; export PATH=\"$VERILATOR_BIN_DIR:\$PATH\"; export FIRESIM_ENV_SOURCED=1; make -C $REMOTE_FIRESIM_DIR JAVA_ARGS=\"-Xmx8G -Xss8M\" $FIRESIM_VARS verilator"

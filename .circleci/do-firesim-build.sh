@@ -43,3 +43,8 @@ fi
 
 run "export FIRESIM_ENV_SOURCED=1; make -C $REMOTE_FIRESIM_DIR clean"
 run "export RISCV=\"$TOOLS_DIR\"; export LD_LIBRARY_PATH=\"$LD_LIB_DIR\"; export PATH=\"$VERILATOR_BIN_DIR:\$PATH\"; export FIRESIM_ENV_SOURCED=1; make -C $REMOTE_FIRESIM_DIR JAVA_ARGS=\"-Xmx8G -Xss8M\" ${mapping[$1]} verilator"
+run "rm -rf $REMOTE_CHIPYARD_DIR/project"
+
+# copy back the final build
+mkdir -p $LOCAL_CHIPYARD_DIR
+copy $SERVER:$REMOTE_CHIPYARD_DIR/ $LOCAL_CHIPYARD_DIR
